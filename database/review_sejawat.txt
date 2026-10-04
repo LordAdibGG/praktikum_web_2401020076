@@ -1,0 +1,25 @@
+BUKTI REVIEW SEJAWAT - PERTEMUAN 4
+Perancangan Basis Data dan SQL Dasar
+
+Pemilik pekerjaan : [Muhammad Adib Haryadi] - 2401020076
+Reviewer          : [Giffari Zakka Wali Andry] - [2401020088]
+Tanggal review    : [04/10/2026]
+Media review      : [WhatsApp]
+
+YANG DIPERIKSA
+Berkas: pertemuan4_struktur.sql, pertemuan4_data.sql, erd_pertemuan4.png
+
+DAFTAR PERIKSA (diisi reviewer: Ya / Tidak)
+1. Entitas dan atribut sudah lengkap?                  : [✓]
+2. Primary key dan foreign key sudah benar?            : [✓]
+3. Relasi 1:N di ERD sudah benar arahnya?              : [✓]
+4. Ada UNIQUE, NOT NULL, dan CHECK?                    : [✓]
+5. Nama database memakai NIM (praktikum_web_NIM)?      : [✓]
+6. Data berbeda dari data contoh modul?                : [✓]
+7. Hasil akhir SELECT JOIN berisi 3 mahasiswa?         : [✓]
+
+SARAN DARI REVIEWER
+[Kalau bisa diperjelas tabelnya dan hubungan antar relasinya]
+
+PERBAIKAN YANG DILAKUKAN
+[Menambahkan label PK, FK, dan UNIQUE pada setiap atribut di ERD, serta keterangan relasi 1:N "satu program studi memiliki banyak mahasiswa"]
