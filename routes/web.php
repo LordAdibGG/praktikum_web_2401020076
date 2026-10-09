@@ -1,63 +1,36 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/mahasiswa/{nim?}', function (?string $nim = null) {
+    try {
+        $pdo = DB::connection()->getPdo();
 
-Route::get('/form-mahasiswa', function () {
-    return view('form-mahasiswa');
-});
+        $sql = 'SELECT m.nim, m.nama, m.email, m.usia,
+                       p.nama_prodi
+                FROM mahasiswa AS m
+                JOIN program_studi AS p
+                    ON p.id = m.program_studi_id';
 
-Route::post('/form-mahasiswa', function (Request $request) {
+        if ($nim !== null) {
+            $sql .= ' WHERE m.nim = :nim';
+        }
 
-    // ===== 1. SANITASI =====
-    $dataBersih = [
-        'nama'  => strip_tags(trim((string) $request->input('nama'))),
-        'email' => filter_var(
-            (string) $request->input('email'),
-            FILTER_SANITIZE_EMAIL
-        ),
-        'nim'   => trim((string) $request->input('nim')),
-        'usia'  => trim((string) $request->input('usia')),
-    ];
+        $sql .= ' ORDER BY m.nim';
 
-    // ===== 2. VALIDASI =====
-    $validator = Validator::make($dataBersih, [
-        'nama'  => ['required', 'min:3', 'max:50'],
-        'email' => ['required', 'email'],
-        'nim'   => ['required', 'digits_between:8,12'],
-        'usia'  => ['required', 'integer', 'min:17', 'max:60'],
-    ], [
-        'nama.required' => 'Nama wajib diisi.',
-        'nama.min'      => 'Nama minimal 3 karakter.',
-        'nama.max'      => 'Nama maksimal 50 karakter.',
+        $statement = $pdo->prepare($sql);
+        $statement->execute($nim !== null ? ['nim' => $nim] : []);
 
-        'email.required' => 'Email wajib diisi.',
-        'email.email'    => 'Format email tidak valid.',
+        $daftarMahasiswa = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        'nim.required'       => 'NIM wajib diisi.',
-        'nim.digits_between' => 'NIM harus berupa angka 8 sampai 12 digit.',
+        return view('mahasiswa', compact('daftarMahasiswa', 'nim'));
+    } catch (\Throwable $error) {
+        report($error);
 
-        'usia.required' => 'Usia wajib diisi.',
-        'usia.integer'  => 'Usia harus berupa angka.',
-        'usia.min'      => 'Usia minimal 17 tahun.',
-        'usia.max'      => 'Usia maksimal 60 tahun.',
-    ]);
-
-    // ===== 3. PENANGANAN ERROR =====
-    if ($validator->fails()) {
-        return redirect('/form-mahasiswa')
-            ->withErrors($validator)
-            ->withInput();
+        return response(
+            'Koneksi atau query basis data gagal. Periksa file .env dan layanan MySQL.',
+            500
+        );
     }
-
-    // ===== 4. DATA VALID =====
-    $data = $validator->validated();
-    $data['usia'] = (int) $data['usia'];
-
-    return view('hasil-form', ['data' => $data]);
 });
